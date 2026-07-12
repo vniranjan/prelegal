@@ -14,6 +14,7 @@
 
 ## Important - debugging and fixing
 - When troubleshooting provlems, ALWAYS identify root cause BEFORE fixing
+- Reproduce consistently.
 - PROVE THE PROBLEM FIRST - don't guess
 - Try one test at a time. Be methodical.
 - Don't jump to conclusions. Don't apply workarounds.
