@@ -1,6 +1,6 @@
 import secrets
 
-from fastapi import APIRouter, Cookie, HTTPException, Response
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 
 from app.db import get_connection
 from app.schemas import LoginRequest, UserResponse
@@ -8,6 +8,29 @@ from app.schemas import LoginRequest, UserResponse
 router = APIRouter(prefix="/api", tags=["auth"])
 
 SESSION_COOKIE = "session_id"
+
+
+def get_current_user(session_id: str | None = Cookie(default=None)) -> UserResponse:
+    if session_id is None:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    conn = get_connection()
+    try:
+        row = conn.execute(
+            """
+            SELECT users.id, users.email FROM sessions
+            JOIN users ON users.id = sessions.user_id
+            WHERE sessions.token = ?
+            """,
+            (session_id,),
+        ).fetchone()
+    finally:
+        conn.close()
+
+    if row is None:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    return UserResponse(id=row["id"], email=row["email"])
 
 
 @router.post("/login", response_model=UserResponse)
@@ -46,24 +69,5 @@ def logout(response: Response) -> dict[str, bool]:
 
 
 @router.get("/me", response_model=UserResponse)
-def me(session_id: str | None = Cookie(default=None)) -> UserResponse:
-    if session_id is None:
-        raise HTTPException(status_code=401, detail="Not logged in")
-
-    conn = get_connection()
-    try:
-        row = conn.execute(
-            """
-            SELECT users.id, users.email FROM sessions
-            JOIN users ON users.id = sessions.user_id
-            WHERE sessions.token = ?
-            """,
-            (session_id,),
-        ).fetchone()
-    finally:
-        conn.close()
-
-    if row is None:
-        raise HTTPException(status_code=401, detail="Not logged in")
-
-    return UserResponse(id=row["id"], email=row["email"])
+def me(user: UserResponse = Depends(get_current_user)) -> UserResponse:
+    return user

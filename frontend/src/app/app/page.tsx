@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import ChatPanel from "@/components/ChatPanel";
 import NdaForm from "@/components/NdaForm";
 import NdaDocument from "@/components/NdaDocument";
 import NdaPdfDownload from "@/components/NdaPdfDownload";
@@ -51,25 +52,29 @@ export default function Home() {
         </button>
       </header>
 
-      <main className="grid flex-1 grid-cols-1 gap-8 p-6 lg:grid-cols-2">
-        <section className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-50">
-            Details
-          </h2>
-          <NdaForm data={data} onChange={setData} />
-        </section>
+      <main className="flex-1 space-y-8 p-6">
+        <ChatPanel data={data} onChange={setData} />
 
-        <section className="flex flex-col rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
-              Preview
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <section className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+            <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-50">
+              Details
             </h2>
-            <NdaPdfDownload data={data} />
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            <NdaDocument data={data} />
-          </div>
-        </section>
+            <NdaForm data={data} onChange={setData} />
+          </section>
+
+          <section className="flex flex-col rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
+                Preview
+              </h2>
+              <NdaPdfDownload data={data} />
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <NdaDocument data={data} />
+            </div>
+          </section>
+        </div>
       </main>
     </div>
   );
