@@ -8,7 +8,7 @@ The available documents are covered in the catalog.json file in the project root
 
 @catalog.json
 
-The current implementation supports all 11 document types via AI chat with full user authentication and document persistence.
+The current implementation covers only the Mutual NDA (via a plain form, not AI chat yet) behind a fake login screen with no persistence. See "Implementation status" at the end of this file for details.
 
 ## Development process
 
@@ -53,3 +53,16 @@ Backend available at http://localhost:8000
 - Purple Secondary: `#753991` (submit buttons)
 - Dark Navy: `#032147` (headings)
 - Gray Text: `#888888`
+
+## Implementation status
+
+**Done (PL-3, PL-4):**
+- `frontend/`: Next.js app, statically exported (`output: "export"`). `/` is a fake login screen (any email/password succeeds); `/app` is the Mutual NDA Creator prototype (form + live preview + PDF download), session-gated behind login.
+- `backend/`: uv-managed FastAPI service serving the static frontend plus `/api/login`, `/api/logout`, `/api/me` (cookie-based session, no real auth) and `/health`. SQLite `users`/`sessions` schema is dropped and recreated on every startup — temporary by design, no persistence across restarts.
+- Packaged as a single Docker image (`Dockerfile`); `scripts/start-*`/`stop-*` for mac/linux/windows build and run it.
+- Backend test suite: `backend/tests/`, run via `uv run pytest`.
+
+**Not yet implemented:**
+- Real user authentication and durable document/user persistence.
+- AI chat for establishing document type and filling in fields (see "AI design" above) — the Mutual NDA form is currently filled in manually, not via chat.
+- The other 10 document types from `catalog.json` — only the Mutual NDA is wired into the frontend.
